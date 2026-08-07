@@ -31,6 +31,59 @@ closed-off demo.
 Two teams work each problem statement independently. That's deliberate: two
 honest attempts at the same problem tell WCC more than one.
 
+### Our solution — Wellington Emergency Information Triage
+
+A public report → an AI clarifier asks a follow-up question, then (after the
+answer) suggests 1-2 actions → that triggers a check against 5 live official
+NZ data sources for the same location → a second AI model triages the
+report's severity in light of that official context → staff see one
+prioritised, location-grouped item on a dashboard. Two small, fully
+fine-tuned models (Phi-3.5-mini) do the clarify/action and triage work — no
+third-party LLM API, no per-token cost, no external vendor dependency during
+an actual emergency.
+
+## Getting started
+
+**See it live:**
+
+- Backend API — https://wellington-poller-ii3mghfupa-ts.a.run.app/events is
+  the "common operating picture" feed other teams' prototypes can point at
+  directly (`GET /events`, filterable by `suburb`, `hazard_type`,
+  `source_type`)
+- Frontend (public report form + staff dashboard) — deployed via GitHub
+  Pages from this repo; link goes here once the Pages deploy is live
+
+**Run it locally:**
+
+Backend (FastAPI + two in-process fine-tuned models):
+
+```bash
+cd backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+Frontend (SvelteKit, both the public form and the staff dashboard in one
+project):
+
+```bash
+cd frontend
+pnpm install
+VITE_API_URL=http://localhost:8000 pnpm run dev
+```
+
+Then open `http://localhost:5173/` (report form) or
+`http://localhost:5173/dashboard/` (staff dashboard).
+
+**Project layout:**
+
+```
+backend/    FastAPI app, official-source pollers, fine-tuned model interfaces
+frontend/   SvelteKit — public report form + staff dashboard, two routes, one project
+docs/       Build plan, fine-tuning plan, frontend plan, pitch
+```
+
 ## Data
 
 The public GIS datasets Wellington City Council Emergency Management shared are
