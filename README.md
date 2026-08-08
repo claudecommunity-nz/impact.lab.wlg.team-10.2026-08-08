@@ -47,7 +47,7 @@ an actual emergency.
 **See it live:**
 
 - **Presentation deck** —
-  https://docs.google.com/presentation/d/1K3LVscDqDza5QsGI_taWXeON9x2mlW7QBsIj4RRLsdI/edit?usp=sharing
+  https://docs.google.com/presentation/d/1hPS23Zs64ihz6spdi_oPm5G-IegdNTjKYh2JBO6PPtE/edit?usp=sharing
 - **Demo video** — _link to be added_
 - Backend API — https://wellington-poller-ii3mghfupa-ts.a.run.app/events is
   the "common operating picture" feed other teams' prototypes can point at
