@@ -24,4 +24,5 @@ frontend/.vercel/
 # OS
 .DS_Store
 
-.bak
+# Working-session backup files (e.g. *.pre-correction.bak from dataset edits)
+*.bak
