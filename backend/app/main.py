@@ -76,6 +76,27 @@ def _new_event_id() -> str:
     return f"community-{int(datetime.now(timezone.utc).timestamp() * 1000)}"
 
 
+def _report_location(report: "CommunityReport") -> Location:
+    """The submitted location with coordinates resolved once, at intake.
+
+    `context.resolve_location()` already prefers real GPS coordinates over the
+    suburb centroid, but it was only ever called *internally* by
+    build_official_context() for distance matching — the resolved centroid was
+    never written back onto the stored event. So any report from a submitter
+    who declined the geolocation prompt was stored with lat/lon null, and the
+    dashboard map (which skips events without coordinates) could never plot
+    it. Resolving here means the stored event matches what BUILD_PLAN's event
+    schema documents: coordinates from the Geolocation API if granted, else
+    the gazetteer's suburb centroid.
+
+    Both remain null when the suburb is unknown/unrecognised — an unplottable
+    report still belongs in the feed, it just has no map position.
+    """
+    submitted = Location(suburb=report.suburb, lat=report.lat, lon=report.lon)
+    lat, lon = context.resolve_location(submitted)
+    return Location(suburb=report.suburb, lat=lat, lon=lon)
+
+
 @app.post("/events/community-report")
 async def submit_community_report(report: CommunityReport):
     """Phase 1: single-step submission, no clarifier call — see module
@@ -85,7 +106,7 @@ async def submit_community_report(report: CommunityReport):
         id=_new_event_id(),
         ingested_at=now,
         event_time=now,
-        location=Location(suburb=report.suburb, lat=report.lat, lon=report.lon),
+        location=_report_location(report),
         raw_text=report.raw_text,
         status="new",
     )
@@ -112,7 +133,7 @@ def submit_for_clarification(report: CommunityReport):
         id=_new_event_id(),
         ingested_at=now,
         event_time=now,
-        location=Location(suburb=report.suburb, lat=report.lat, lon=report.lon),
+        location=_report_location(report),
         raw_text=report.raw_text,
         clarification_question=question,
         status="awaiting_clarification",

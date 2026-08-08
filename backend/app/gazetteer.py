@@ -39,6 +39,13 @@ def mentions_wellington_region(text: str) -> bool:
 # lat/lon when the submitter only gives a suburb name, not coordinates.
 # Demo-scale accuracy only (good enough for a 10-20km relevance radius), not
 # precision geocoding.
+#
+# This must stay a superset-by-name of the suburb entries in
+# WELLINGTON_PLACE_NAMES above. It drifted out of sync: several names the
+# keyword matcher recognised (Hataitai among them) had no centroid here, so a
+# report from one of those suburbs resolved to no coordinates at all — which
+# both excluded it from the dashboard map and skipped every distance-based
+# official-source match for it. Add to both lists when adding a suburb.
 WELLINGTON_SUBURB_COORDS: dict[str, tuple[float, float]] = {
     "wellington": (-41.2865, 174.7762),
     "ngaio": (-41.2408, 174.7645),
@@ -66,4 +73,32 @@ WELLINGTON_SUBURB_COORDS: dict[str, tuple[float, float]] = {
     "petone": (-41.2261, 174.8697),
     "wainuiomata": (-41.2589, 174.9522),
     "masterton": (-40.9597, 175.6575),
+    # Added to close the drift against WELLINGTON_PLACE_NAMES described above.
+    # Wellington City
+    "hataitai": (-41.3078, 174.7955),
+    "wadestown": (-41.2664, 174.7679),
+    "aro valley": (-41.2946, 174.7614),
+    "berhampore": (-41.3186, 174.7746),
+    "mount cook": (-41.3036, 174.7726),
+    "lyall bay": (-41.3286, 174.7969),
+    "roseneath": (-41.2925, 174.8022),
+    "oriental bay": (-41.2925, 174.7930),
+    "vogeltown": (-41.3175, 174.7657),
+    "highbury": (-41.2947, 174.7539),
+    "grenada": (-41.2036, 174.8231),
+    # Hutt Valley
+    "eastbourne": (-41.2925, 174.9008),
+    "stokes valley": (-41.1750, 174.9800),
+    "taita": (-41.1789, 174.9614),
+    "naenae": (-41.1972, 174.9469),
+    "avalon": (-41.1919, 174.9394),
+    # Porirua / Kapiti
+    "whitby": (-41.1183, 174.8931),
+    "paremata": (-41.1017, 174.8672),
+    "plimmerton": (-41.0839, 174.8642),
+    "otaki": (-40.7558, 175.1386),
+    # Wairarapa
+    "carterton": (-41.0233, 175.5228),
+    "greytown": (-41.0794, 175.4614),
+    "featherston": (-41.1147, 175.3239),
 }
