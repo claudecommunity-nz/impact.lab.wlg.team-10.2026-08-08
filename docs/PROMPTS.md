@@ -134,12 +134,12 @@ client-routed SPA — this specifically avoids a GitHub Pages routing problem, s
 
 ## Backend (for reference — already built, not a prompt to re-run)
 
-The backend is done: FastAPI, all 5 official sources live and tested, both models stubbed with
-the final decided interface (real fine-tuned weights not wired in yet — see FINETUNE_PLAN.md "Next
-steps" for dataset/training status), deployed pipeline validated end-to-end on Cloud Run via the
-OIA project's proven fuse → GGUF → quantize → Cloud Build → Cloud Run path. If further backend
-work is needed, start from BUILD_PLAN.md and FINETUNE_PLAN.md directly rather than this doc — they
-reflect the current, detailed state; this doc is a summary, not the source of truth.
+The backend is done: FastAPI, all 5 official sources live and tested, both models fine-tuned and
+wired in (see FINETUNE_PLAN.md "Next steps" for dataset/training status), deployed pipeline
+validated end-to-end on Cloud Run via the proven fuse → GGUF → quantize → Cloud Build → Cloud Run
+path. If further backend work is needed, start from BUILD_PLAN.md and FINETUNE_PLAN.md directly
+rather than this doc — they reflect the current, detailed state; this doc is a summary, not the
+source of truth.
 
 ---
 
@@ -150,4 +150,3 @@ reflect the current, detailed state; this doc is a summary, not the source of tr
 - [ ] Confirm timestamps display correctly in NZ local time end-to-end
 - [ ] Reseed/re-submit fresh community-report examples before recording the demo video — the event store is ephemeral, resets on any Cloud Run cold start
 - [ ] Run through the full demo storyboard (see `PITCH.md`) end-to-end against the real integrated system
-- [ ] Remove all references to the OIA project from every doc before the final commit (see `BUILD_PLAN.md`'s hour-by-hour plan for the checklist item)

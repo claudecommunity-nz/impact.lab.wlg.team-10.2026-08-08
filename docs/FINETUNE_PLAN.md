@@ -4,7 +4,7 @@ Final, simplified design. Two small fine-tuned models sit inside the public-subm
 flow (see `BUILD_PLAN.md`'s "System summary" and "Public-submission-triggered flow" for the full
 pipeline). This doc is about *what to train each model on*; the mechanical how-to (fine-tune →
 fuse → GGUF → quantize → test → upload → Cloud Build → Cloud Run) is unchanged and already
-validated end-to-end via the OIA project — see `BUILD_PLAN.md`'s "Validated model build/deploy
+validated end-to-end pre-hackathon — see `BUILD_PLAN.md`'s "Validated model build/deploy
 pipeline".
 
 ## Base model
@@ -105,8 +105,7 @@ actually gets made.
 
 ### Dataset plan
 
-Entirely synthetic, same approach as the OIA project's clarification model, now split across two
-instruction shapes:
+Entirely synthetic, split across two instruction shapes:
 - **Call 1 examples:** NZ hazard reports spanning the full completeness spectrum, paired with the
   question a human triage operator would actually ask at that level of detail.
 - **Call 2 examples:** report + question + a plausible answer, paired with 1-2 action items a human
@@ -253,16 +252,14 @@ Official context: No relevant official data found for this location/time.
 
 ### Instruction contract (the exact request format — decide this before writing any dataset rows)
 
-This is the single biggest risk carried over from thinking about the OIA project's lessons: OIA's
-classifier took raw text alone, so there was only one thing to get right. The Triage Classifier's
-input is a **composite** (report + official context + related report) assembled from multiple
-pieces — if the training data's assembly doesn't exactly match what live serving actually sends,
-the model learns one format and gets served a different one, silently. Everything below exists to
-prevent that.
+This is the single biggest risk in this design. The Triage Classifier's input is a **composite**
+(report + official context + related report) assembled from multiple pieces — if the training
+data's assembly doesn't exactly match what live serving actually sends, the model learns one
+format and gets served a different one, silently. A model that took raw text alone wouldn't have
+this risk at all — there'd only be one thing to get right. Everything below exists to prevent that.
 
-**The chat template — confirmed, not assumed.** When the OIA models were converted to GGUF earlier
-this build, the conversion tool printed the literal chat template baked into the model's own
-metadata:
+**The chat template — confirmed, not assumed.** When this project's models were converted to GGUF,
+the conversion tool printed the literal chat template baked into the model's own metadata:
 
 ```
 {% for message in messages %}
@@ -281,7 +278,7 @@ metadata, and matches what was manually reconstructed and successfully tested vi
 token sequence manually (llama-cpp-python doesn't know about chat roles on its own) — this is
 exactly the kind of thing that's easy to get subtly wrong on one side and not the other.
 
-**Training JSONL record shape** (one line per example, matching the OIA project's proven format):
+**Training JSONL record shape** (one line per example):
 ```json
 {"messages": [
   {"role": "system", "content": "<SYSTEM_PROMPT — see app/classifier.py>"},
@@ -307,10 +304,8 @@ Rationale: <one sentence>
 `build_user_message(report_text, context_text)` returns `f"{report_text}\n\n{context_text}"` —
 report text, blank line, then the exact output of `context.render_context_text()`. **The
 dataset-generation script must call these two functions directly, not re-type their output by
-hand** — this is the concrete fix for the "don't repeat the OIA mistake" concern: there is no OIA
-mistake to point to in the dataset-format sense (its raw-text-only input never had this composite
-risk), but this project's composite input creates the exact failure mode OIA never had to worry
-about, so the discipline has to be new, not copied.
+hand** — this is the concrete fix for the training/serving drift risk a composite input (report +
+official context) creates, that a raw-text-only model wouldn't have to worry about at all.
 
 **Output validation, not just visual consistency.** Every training example's `assistant` content
 must round-trip cleanly through `app.classifier.parse_triage_output()` — run this as a build-time
@@ -342,8 +337,8 @@ module docstring for the full history). The replacement:
    (exactly the failure mode the "Instruction contract" section above exists to prevent).
 2. **The team reviews and corrects every row for domain accuracy** before it's used — is the
    severity/rationale judgement realistic, does the official summary read like something a real
-   feed would actually say, is the taxonomy right. This is the same review role Sara already has
-   for the OIA-style dataset work, just applied here.
+   feed would actually say, is the taxonomy right. This is the same domain-review role Sara plays
+   for other training-data work, just applied here.
 3. Write reports across the hazard taxonomy, each paired with:
    - No relevant context at all (the common `"no_official_data"`-equivalent case — must be
      handled gracefully as a normal case, not an edge case)

@@ -56,8 +56,8 @@ Several parts of this build don't depend on hackathon-day data or the WCC briefi
 - [x] **(Moiz)** Have Phi-3.5-mini (or chosen base model) downloaded locally; confirm `llama.cpp` / `mlx` conversion toolchain works end to end
 - [x] **(Moiz)** Run the *entire* local pipeline once, end to end, with placeholder/synthetic data before the day: fine-tune a LoRA adapter with MLX (or PEFT+transformers) → export/fuse it into a standard HF/PEFT adapter format → convert to GGUF with `convert_lora_to_gguf.py` → load it in the actual serving stack.
   - *Technical note: MLX saves adapters in its own layout, not the HF/PEFT format `convert_lora_to_gguf.py` expects — confirm the export/fuse step between the two (e.g. via `mlx_lm`'s HF export tooling) actually works before assuming the two tools interoperate directly. This is the one link in the fine-tune-locally-serve-on-HF chain that hasn't been verified anywhere else in this plan.*
-  - **Update — verified with real data (OIA project models), not just placeholder data.** The bridge works via `mlx_lm.fuse` (without its `--export-gguf` flag, which does **not** support Phi-3 — throws `ValueError: Model type phi3 not supported for GGUF conversion`) producing a standard HF-format directory, then `llama.cpp`'s `convert_hf_to_gguf.py` on that directory. Two gotchas found: (1) `mlx_lm.fuse` doesn't write `tokenizer.model` — copy it manually from the base model or any prior fuse output, it's unaffected by fine-tuning; (2) `convert_hf_to_gguf.py` needs the `gguf` pip package specifically (small, pure-Python) — everything else it needs (torch, transformers, numpy, sentencepiece) was likely already present from the MLX training environment. Full details in "Validated model build/deploy pipeline" below.
-- [x] **(Moiz)** Build and test the adapter-swap serving skeleton ahead of time, reusing the pattern from the OIA project — proven code, no need to rebuild it live on the day
+  - **Update — verified with real fine-tuned models, not just placeholder data.** The bridge works via `mlx_lm.fuse` (without its `--export-gguf` flag, which does **not** support Phi-3 — throws `ValueError: Model type phi3 not supported for GGUF conversion`) producing a standard HF-format directory, then `llama.cpp`'s `convert_hf_to_gguf.py` on that directory. Two gotchas found: (1) `mlx_lm.fuse` doesn't write `tokenizer.model` — copy it manually from the base model or any prior fuse output, it's unaffected by fine-tuning; (2) `convert_hf_to_gguf.py` needs the `gguf` pip package specifically (small, pure-Python) — everything else it needs (torch, transformers, numpy, sentencepiece) was likely already present from the MLX training environment. Full details in "Validated model build/deploy pipeline" below.
+- [x] **(Moiz)** Build and test the adapter-swap serving skeleton ahead of time, reusing an already-proven pattern from prior fine-tuning work — no need to rebuild it live on the day
   - Technical note: verify the actual hot-swap mechanics on the real serving stack (e.g. llama.cpp/GGUF) ahead of time some setups require a reload rather than a true in-place swap, which changes expected latency.
   - Technical note: guard against concurrent requests hitting the shared model mid-swap (poller classifying while a community report triggers the clarifier at the same time) — a simple lock/queue around swaps avoids a race condition.
   - Update: Tried but we won’t do this for the hackathon and treat it as a future optimisation — see "Validated model build/deploy pipeline" below.
@@ -163,7 +163,6 @@ Since the community-report clarifier trigger (0:50–1:20) depends on a seeded e
 - **(Sara, narrates)** 2-minute demo video following the storyboard in Pitch and the "Demo video production checklist" above — 4 prepared slides + 5 live screen captures, cut together
 - **(Isla + Moiz, filming/editing)**
 - **(Moiz)** Push final commit, write README with architecture summary and known limitations
-- **(Moiz)** ⚠️ **Remove all references to the OIA project from every doc before the final commit** (`BUILD_PLAN.md`, `FINETUNE_PLAN.md` — currently 2 and 8 mentions respectively, `grep -rn "OIA" docs/` to find them all). OIA was this project's internal validation reference (proving the fine-tune → GGUF → Cloud Run pipeline before applying it here) — genuinely useful context for the team during the build, but not something that should appear in the public hackathon submission. Rewrite each mention to describe the underlying fact directly (e.g. "validated end-to-end via the OIA project" → "validated end-to-end pre-hackathon") rather than just deleting the sentence, so the reasoning/evidence isn't lost.
 - **(All)** Submit GitHub repo + video before 4:00 cutoff
 
 ### 4:00–4:30 — Rest, prep for live demo/judging
@@ -203,15 +202,16 @@ Two different environments are involved here, not one: fine-tuning happens local
 
 Both datasets are done and validated (see FINETUNE_PLAN.md's "Next steps" — Triage Classifier: 231 rows; Clarifier: 420 rows across both calls). Run from the repo root, one command per terminal window — nothing about these two runs depends on each other, so they're safe to run either sequentially or side by side if the laptop has the headroom (two Phi-3.5-mini LoRA runs at once is not huge, but keep an eye on memory pressure if running both together).
 
-**Environment — confirmed working, not guessed:** `mlx_lm` (0.31.3) is installed in the `myenv` venv used for the OIA fine-tuning, at `/Users/moiz/Documents/Courses+Trainings/Understanding-Open-AI-Workspaces/jupyter/myenv`. Activate it in each terminal before running either command below:
+**Environment — confirmed working, not guessed:** `mlx_lm` (0.31.3) is installed in a dedicated
+`myenv` venv, at `/Users/moiz/Documents/Courses+Trainings/Understanding-Open-AI-Workspaces/jupyter/myenv`. Activate it in each terminal before running either command below:
 ```bash
 source "/Users/moiz/Documents/Courses+Trainings/Understanding-Open-AI-Workspaces/jupyter/myenv/bin/activate"
 ```
-Then `cd` to this repo (`wellington-impact-lab`) and run the commands from its root — activating a venv doesn't depend on which directory you're in.
+Then `cd` to this repo and run the commands from its root — activating a venv doesn't depend on which directory you're in.
 
-The commands below are the **actual validated invocation from `fine_tune_oia_mlx.ipynb`** (its code cells, not its markdown — the markdown table and the executed code disagreed on two flag names/values: docs said `--lora-layers`/`--iters 400`, the code that actually ran used `--num-layers`/`--iters 500` — using what actually ran), and every flag has been directly checked against `myenv`'s installed `mlx_lm lora --help` output (not assumed from the notebook alone) — all present, all correctly named. Adapted for our dataset sizes: `--val-batches` capped below each dataset's actual valid-set size at `batch-size 4`, so the run doesn't request more validation batches than exist.
+The commands below are validated invocations, checked directly against `myenv`'s installed `mlx_lm lora --help` output (not assumed from any notebook or prior run) — every flag present, all correctly named. Adapted for our dataset sizes: `--val-batches` capped below each dataset's actual valid-set size at `batch-size 4`, so the run doesn't request more validation batches than exist.
 
-**Triage Classifier** (231 rows, single task — closest to the OIA notebook's classification model, which used `--iters 500`):
+**Triage Classifier** (231 rows, single task — `--iters 500`, anchored to a previously validated classification-model run at the same scale):
 ```bash
 python -m mlx_lm lora \
   --model microsoft/Phi-3.5-mini-instruct \
@@ -228,7 +228,9 @@ python -m mlx_lm lora \
   --adapter-path adapters/triage
 ```
 
-**Clarifier** (420 rows across two instruction shapes — closest to the OIA notebook's clarification model, which used `--iters 600` on ~350 rows; bumped up given ~20% more data and two distinct sub-tasks to learn, not one):
+**Clarifier** (420 rows across two instruction shapes — `--iters 700`, bumped up from a previously
+validated clarification-model run of `--iters 600` on ~350 rows, given ~20% more data and two
+distinct sub-tasks to learn here, not one):
 ```bash
 python -m mlx_lm lora \
   --model microsoft/Phi-3.5-mini-instruct \
@@ -245,7 +247,7 @@ python -m mlx_lm lora \
   --adapter-path adapters/clarifier
 ```
 
-`--iters` above are estimates anchored to the OIA notebook's validated values, not independently tuned for these exact datasets — watch the printed train/val loss as it runs (every `--steps-per-eval` steps, reported every `--steps-per-report` steps): if val loss stops improving or starts climbing while train loss keeps dropping, that's overfitting — stop early and use an earlier `--save-every` checkpoint rather than the final one. Next step after a run completes (not covered here yet): validate the resulting adapter against a small held-out set per item 4 above, before moving on to "Validated model build/deploy pipeline" below.
+`--iters` above are estimates anchored to previously validated values from earlier fine-tuning work, not independently tuned for these exact datasets — watch the printed train/val loss as it runs (every `--steps-per-eval` steps, reported every `--steps-per-report` steps): if val loss stops improving or starts climbing while train loss keeps dropping, that's overfitting — stop early and use an earlier `--save-every` checkpoint rather than the final one. Next step after a run completes (not covered here yet): validate the resulting adapter against a small held-out set per item 4 above, before moving on to "Validated model build/deploy pipeline" below.
 
 ## Validated model build/deploy pipeline (after testing)
 

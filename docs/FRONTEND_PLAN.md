@@ -80,15 +80,16 @@ what makes GitHub Pages work without a client-side-routing hack.
 
 ## Hosting: dual-platform design
 
-**The `vercel.json` rewrite-proxy pattern from the OIA project is deliberately not used here** —
-GitHub Pages has no server-side rewrite capability at all (it's pure static file hosting), so
-anything relying on that pattern wouldn't be portable. Instead:
+**A `vercel.json` rewrite-proxy pattern (relative API paths rewritten server-side to the backend)
+was considered and deliberately not used here** — GitHub Pages has no server-side rewrite
+capability at all (it's pure static file hosting), so anything relying on that pattern wouldn't be
+portable. Instead:
 
 - **Direct `fetch()` to the full backend URL**, not a relative path proxied through the host. This
   works because `CORSMiddleware` (`allow_origins=["*"]`) is already on the backend (see
-  `BUILD_PLAN.md`'s API section) — no proxy is needed to avoid CORS issues, which was the actual
-  reason the Vercel rewrite pattern existed in the OIA project. The backend's full URL gets baked
-  in at build time via `VITE_API_URL`, read the same way regardless of host.
+  `BUILD_PLAN.md`'s API section) — no proxy is needed to avoid CORS issues, which is the only
+  reason a rewrite pattern like that would exist in the first place. The backend's full URL gets
+  baked in at build time via `VITE_API_URL`, read the same way regardless of host.
 - **`adapter-static` with prerendering** for both routes (`/` and `/dashboard`) — generates real
   static HTML files per route (`index.html`, `dashboard/index.html`), not a client-side-routed SPA
   that needs a fallback trick. GitHub Pages 404s on direct navigation/refresh to a client-routed
