@@ -1,7 +1,7 @@
 # Impact Lab Wellington — Team 10: The Cherry Hackers
 
 **Wellington City Council Emergency Management × Claude Code Community NZ**
-Saturday 8 August 2026 · Waimanga Room, Wellington City Council
+Saturday 8 August 2026 · Wellington City Council
 
 ---
 
@@ -19,19 +19,7 @@ A prototype could extract location, time, issue and potential urgency; group sim
 
 ---
 
-## What we're building
-
-One working prototype, demoed in four minutes at 16:30.
-
-Each team's module is meant to slot into a shared **common operating picture** —
-a live map of emergency signals that the ten prototypes feed together. Aim for
-something that can be pointed at a map, a feed or an API, rather than a
-closed-off demo.
-
-Two teams work each problem statement independently. That's deliberate: two
-honest attempts at the same problem tell WCC more than one.
-
-### Our solution — Wellington Emergency Information Triage
+## Our solution — Wellington Emergency Information Triage
 
 A public report → an AI clarifier asks a follow-up question, then (after the
 answer) suggests 1-2 actions → that triggers a check against 5 live official
@@ -40,7 +28,9 @@ report's severity in light of that official context → staff see one
 prioritised, location-grouped item on a dashboard. Two small, fully
 fine-tuned models (Phi-3.5-mini) do the clarify/action and triage work — no
 third-party LLM API, no per-token cost, no external vendor dependency during
-an actual emergency.
+an actual emergency. This is a concept of a platform that aids organisations 
+in their AI-powered transformations in a financially, socially, and
+environmentally sustainable way.
 
 ## Getting started
 
@@ -48,14 +38,14 @@ an actual emergency.
 
 - **Presentation deck** —
   https://docs.google.com/presentation/d/1hPS23Zs64ihz6spdi_oPm5G-IegdNTjKYh2JBO6PPtE/edit?usp=sharing
-- **Demo video** — _link to be added_
+- **Demo video** — https://github.com/claudecommunity-nz/impact.lab.wlg.team-10.2026-08-08/raw/refs/heads/main/Video%20Summary.mp4
 - Backend API — https://wellington-poller-ii3mghfupa-ts.a.run.app/events is
   the "common operating picture" feed other teams' prototypes can point at
   directly (`GET /events`, filterable by `suburb`, `hazard_type`,
   `source_type`)
 - Frontend — deployed via GitHub Pages from this repo:
   - **Report a hazard** (public form) —
-    https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/
+    https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/clarify=1
   - **Staff dashboard** (triage queue + map) —
     https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/dashboard/
 
@@ -87,10 +77,10 @@ Then open `http://localhost:5173/` (report form) or
 ```
 backend/    FastAPI app, official-source pollers, fine-tuned model interfaces
 frontend/   SvelteKit — public report form + staff dashboard, two routes, one project
-docs/       Build plan, fine-tuning plan, frontend plan, pitch
+docs/       Build plan, fine-tuning plan, frontend plan, draft solution/pitch
 ```
 
-## Data
+## Data (provided by organisers)
 
 The public GIS datasets Wellington City Council Emergency Management shared are
 catalogued, checked and made queryable here:
@@ -121,18 +111,6 @@ Three traps worth knowing before you lose an hour to them:
   then refuse to answer. Ask them for a PNG instead.
 - **One query is silently capped** (`footpaths` has 8,130 features; a request
   returns 2,000). Page properly, or check `exceededTransferLimit`.
-
-## Schedule
-
-| Time | What |
-|---|---|
-| 08:00 | Arrival and mingle |
-| 09:00 | Opening address & problem briefing |
-| 09:30 | Build begins |
-| 12:30 | Lunch + lightning talks |
-| 16:00 | Submissions close |
-| 16:30 | Demos + judging |
-| 17:45 | Awards + next steps |
 
 ## Ground rules
 
