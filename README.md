@@ -1,4 +1,4 @@
-# Impact Lab Wellington — Team 10
+# Impact Lab Wellington — Team 10: The Cherry Hackers
 
 **Wellington City Council Emergency Management × Claude Code Community NZ**
 Saturday 8 August 2026 · Waimanga Room, Wellington City Council
