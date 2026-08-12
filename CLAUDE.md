@@ -5,24 +5,11 @@ Context for Claude Code working in this repo.
 ## The event
 
 A one-day build with Wellington City Council Emergency Management, Saturday
-8 August 2026, at the Waimanga Room, Wellington City Council. Ten teams, five
-problem statements, two teams per statement. Each team ships one working
-prototype and demos it for four minutes.
+8 August 2026, at Wellington City Council. Ten teams, five problem
+statements, two teams per statement. Each team shipped one working
+prototype and demoed it for four minutes.
 
-## Timeline for the day
-
-| Time | What |
-|---|---|
-| 08:00 | Arrival and mingle |
-| 09:00 | Opening address & problem briefing |
-| 09:30 | Build begins |
-| 12:30 | Lunch + lightning talks |
-| 16:00 | Submissions close |
-| 16:30 | Demos + judging |
-| 17:45 | Awards + next steps |
-
-Build time is roughly six and a half hours, minus lunch. Scope accordingly:
-a narrow thing that works beats a broad thing that doesn't demo.
+See `docs/PITCH.md` for the solution pitch and demo narrative.
 
 ## This team's problem — 04: Help emergency staff sort and prioritise incoming information
 
@@ -164,6 +151,8 @@ using the provided catalogue, rather than assuming.
   contract, dataset plan, taxonomy, official-context format
 - `docs/FRONTEND_PLAN.md` — the two frontends' design
 - `docs/PITCH.md` — the pitch/demo narrative, including the live-demo script
+- `docs/KNOWN_ISSUES.md` — everything known to be wrong, missing or
+  deliberately simplified, with status per item
 - `backend/app/sources/` — one module per official data source
 - `backend/app/context.py` — the aggregator (deterministic context-building)
 - `backend/app/classifier.py` / `backend/app/clarifier.py` — the two
