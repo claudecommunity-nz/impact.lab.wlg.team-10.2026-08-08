@@ -32,13 +32,14 @@ an actual emergency. This is a concept of a platform that aids organisations
 in their AI-powered transformations in a financially, socially, and
 environmentally sustainable way.
 
-## Getting started
+*For an architecture diagram of this flow, see the demo video linked below.*
 
-**See it live:**
+## See it live
 
 - **Presentation deck** —
   https://docs.google.com/presentation/d/1hPS23Zs64ihz6spdi_oPm5G-IegdNTjKYh2JBO6PPtE/edit?usp=sharing
 - **Demo video** — https://github.com/claudecommunity-nz/impact.lab.wlg.team-10.2026-08-08/raw/refs/heads/main/Video%20Summary.mp4
+- **Proposed solution and rationale** — [`docs/PITCH.md`](docs/PITCH.md), the more detailed narrative and proposal
 - Backend API — https://wellington-poller-ii3mghfupa-ts.a.run.app/events is
   the "common operating picture" feed other teams' prototypes can point at
   directly (`GET /events`, filterable by `suburb`, `hazard_type`,
@@ -48,6 +49,8 @@ environmentally sustainable way.
     https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/clarify=1
   - **Staff dashboard** (triage queue + map) —
     https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/dashboard/
+
+## Getting started
 
 **Run it locally:**
 
@@ -77,8 +80,19 @@ Then open `http://localhost:5173/` (report form) or
 ```
 backend/    FastAPI app, official-source pollers, fine-tuned model interfaces
 frontend/   SvelteKit — public report form + staff dashboard, two routes, one project
-docs/       Build plan, fine-tuning plan, frontend plan, draft solution/pitch
+docs/       Build plan, fine-tuning plan, frontend plan, solution pitch, known issues
 ```
+
+**Docs:**
+
+| File | What's in it |
+|---|---|
+| [`docs/PITCH.md`](docs/PITCH.md) | Pitch/demo narrative, including the live-demo script |
+| [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) | System flow, API contract, event schema, deployment map, fine-tuning commands |
+| [`docs/FINETUNE_PLAN.md`](docs/FINETUNE_PLAN.md) | What each model is trained on: instruction contract, dataset plan, taxonomy |
+| [`docs/FRONTEND_PLAN.md`](docs/FRONTEND_PLAN.md) | The two frontends' design |
+| [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md) | Everything known to be wrong, missing or deliberately simplified, with status per item |
+| [`docs/PROMPTS.md`](docs/PROMPTS.md) | Prompts used during the build |
 
 ## Data (provided by organisers)
 
