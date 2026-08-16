@@ -21,34 +21,34 @@ A prototype could extract location, time, issue and potential urgency; group sim
 
 ## Our solution — Wellington Emergency Information Triage
 
-A public report → an AI clarifier asks a follow-up question, then (after the
+A public report → an AI-powered clarifier asks a follow-up question, then (after the
 answer) suggests 1-2 actions → that triggers a check against 5 live official
 NZ data sources for the same location → a second AI model triages the
 report's severity in light of that official context → staff see one
-prioritised, location-grouped item on a dashboard. Two small, fully
-fine-tuned models (Phi-3.5-mini) do the clarify/action and triage work — no
-third-party LLM API, no per-token cost, no external vendor dependency during
-an actual emergency. This is a concept of a platform that aids organisations 
-in their AI-powered transformations in a financially, socially, and
-environmentally sustainable way.
+prioritised, location-grouped item on a dashboard. 
 
-*For an architecture diagram of this flow, see the demo video linked below.*
+Two small, fully fine-tuned models (Phi-3.5-mini) do the clarify/action and triage 
+work — no third-party LLM API, no per-token cost, no external vendor dependency during
+an actual emergency. This is a concept of a platform that aids organisations in their 
+AI-powered transformations in a financially, socially, and environmentally sustainable 
+way.
+
+**Details of the solution and rationale:** — [`docs/PITCH.md`](docs/PITCH.md)
+
+*For an architecture overview, see the [video summary](https://github.com/claudecommunity-nz/impact.lab.wlg.team-10.2026-08-08/raw/refs/heads/main/Video%20Summary.mp4).*
+
 
 ## See it live
 
-- **Presentation deck** —
-  https://docs.google.com/presentation/d/1hPS23Zs64ihz6spdi_oPm5G-IegdNTjKYh2JBO6PPtE/edit?usp=sharing
-- **Demo video** — https://github.com/claudecommunity-nz/impact.lab.wlg.team-10.2026-08-08/raw/refs/heads/main/Video%20Summary.mp4
-- **Proposed solution and rationale** — [`docs/PITCH.md`](docs/PITCH.md), the more detailed narrative and proposal
-- Backend API — https://wellington-poller-ii3mghfupa-ts.a.run.app/events is
-  the "common operating picture" feed other teams' prototypes can point at
-  directly (`GET /events`, filterable by `suburb`, `hazard_type`,
+- **2-min video summary** — [`Video Summary.mp4`](https://github.com/claudecommunity-nz/impact.lab.wlg.team-10.2026-08-08/raw/refs/heads/main/Video%20Summary.mp4)
+- Two frontends (deployed to GitHub Pages from this repo):
+  - **Report a hazard** —
+    [Public-facing web app](https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/clarify=1)
+  - **Staff dashboard** —
+    [Triaged + mapped events for council staff](https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/dashboard/)
+- Backend API — The triaged event store ([`/events` API endpoint](https://wellington-poller-ii3mghfupa-ts.a.run.app/events)) as the "common operating picture" feed other apps can utilise (by `GET /events`, filterable by `suburb`, `hazard_type`,
   `source_type`)
-- Frontend — deployed via GitHub Pages from this repo:
-  - **Report a hazard** (public form) —
-    https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/clarify=1
-  - **Staff dashboard** (triage queue + map) —
-    https://claudecommunity-nz.github.io/impact.lab.wlg.team-10.2026-08-08/dashboard/
+- **Presentation deck** — [For the post-hackhaton live demo](https://docs.google.com/presentation/d/1hPS23Zs64ihz6spdi_oPm5G-IegdNTjKYh2JBO6PPtE/edit?usp=sharing)
 
 ## Getting started
 
